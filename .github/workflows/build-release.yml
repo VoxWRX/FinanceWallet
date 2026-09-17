@@ -1,0 +1,80 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: Finance_Wallet.exe
+            asset_name: Finance_Wallet_Windows.exe
+          - os: macos-latest
+            artifact_name: Finance_Wallet_Mac.zip
+            asset_name: Finance_Wallet_Mac.zip
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build Windows Executable
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        $CTK_LOC = python -c "import customtkinter, os; print(os.path.dirname(customtkinter.__file__))"
+        pyinstaller --noconfirm --onefile --windowed --name "Finance Wallet" --add-data="${CTK_LOC};customtkinter/" --add-data="themes;themes/" app.py
+
+    - name: Build macOS Application
+      if: matrix.os == 'macos-latest'
+      run: |
+        CTK_LOC=$(python -c "import customtkinter, os; print(os.path.dirname(customtkinter.__file__))")
+        pyinstaller --noconfirm --onedir --windowed --name "Finance Wallet" --add-data="${CTK_LOC}:customtkinter/" --add-data="themes:themes/" app.py
+        cd dist
+        zip -r Finance_Wallet_Mac.zip "Finance Wallet.app"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.asset_name }}
+        path: ${{ matrix.os == 'windows-latest' && 'dist/Finance Wallet.exe' || 'dist/Finance_Wallet_Mac.zip' }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Windows Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: Finance_Wallet_Windows.exe
+        path: dist/
+        
+    - name: Download macOS Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: Finance_Wallet_Mac.zip
+        path: dist/
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          dist/Finance_Wallet_Windows.exe
+          dist/Finance_Wallet_Mac.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
