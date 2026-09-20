@@ -10,7 +10,7 @@ A lightweight, local, multi-user desktop application for managing your personal 
 - **Data Export**: Export your transactions and reports cleanly to Excel files in the `exports/` folder.
 - **Dynamic Reports**: Interactive matplotlib charts for monthly and annual income vs. expenses.
 
-## Running Locally
+## Running Locally (macOS / Linux)
 
 1. Create a virtual environment and install dependencies:
    ```bash
@@ -21,6 +21,31 @@ A lightweight, local, multi-user desktop application for managing your personal 
 2. Run the application:
    ```bash
    python3 app.py
+   ```
+
+## Running Locally (Windows)
+
+**Prerequisites:** Ensure you have Python 3.8+ installed and added to your system PATH.
+
+1. **Clone the repository:**
+   ```cmd
+   git clone <repository_url>
+   cd <repository_folder_name>
+   ```
+2. **Create a virtual environment:**
+   ```cmd
+   python -m venv venv
+   ```
+3. **Activate the virtual environment:**
+   - In Command Prompt: `venv\Scripts\activate.bat`
+   - In PowerShell: `venv\Scripts\Activate.ps1`
+4. **Install dependencies:**
+   ```cmd
+   pip install -r requirements.txt
+   ```
+5. **Run the application:**
+   ```cmd
+   python app.py
    ```
 
 ## Running with Docker (macOS)
