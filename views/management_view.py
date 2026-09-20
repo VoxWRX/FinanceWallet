@@ -28,34 +28,46 @@ class ManagementView(ctk.CTkFrame):
         self.tab_tx.grid_rowconfigure(1, weight=1)
         self.tab_tx.grid_columnconfigure(0, weight=1)
         
-        # Filters & Actions
+        # Filters & Actions - Convert pack() to grid()
         top_bar = ctk.CTkFrame(self.tab_tx, fg_color="transparent")
-        top_bar.grid(row=0, column=0, sticky="ew", pady=(0, 10))
+        top_bar.grid(row=0, column=0, sticky="nsew")  # Use 'nsew' instead of 'ew'
         
-        self.start_date_entry = ctk.CTkEntry(top_bar, placeholder_text="Start (YYYY-MM-DD)", width=130, font=ctk.CTkFont(family="Noteworthy", size=12))
-        self.start_date_entry.pack(side="left", padx=5)
+        row = 0
+        col = 0
         
-        self.end_date_entry = ctk.CTkEntry(top_bar, placeholder_text="End (YYYY-MM-DD)", width=130, font=ctk.CTkFont(family="Noteworthy", size=12))
-        self.end_date_entry.pack(side="left", padx=5)
+        self.tag_filter_entry = ctk.CTkEntry(top_bar, placeholder_text="Tag (e.g. food)", width=100, font=ctk.CTkFont(family="Noteworthy", size=12))
+        self.tag_filter_entry.grid(row=row, column=col, padx=5, pady=(5, 5), sticky="w")
+        col += 1
         
         self.type_var = ctk.StringVar(value="All")
         type_dropdown = ctk.CTkOptionMenu(top_bar, variable=self.type_var, values=["All", "Expense", "Income"], width=100, font=ctk.CTkFont(family="Noteworthy", size=12))
-        type_dropdown.pack(side="left", padx=5)
+        type_dropdown.grid(row=row, column=col, padx=5, pady=(5, 5), sticky="w")
+        col += 1
         
-        self.tag_filter_entry = ctk.CTkEntry(top_bar, placeholder_text="Tag (e.g. food)", width=100, font=ctk.CTkFont(family="Noteworthy", size=12))
-        self.tag_filter_entry.pack(side="left", padx=5)
+        self.start_date_entry = ctk.CTkEntry(top_bar, placeholder_text="Start (YYYY-MM-DD)", width=130, font=ctk.CTkFont(family="Noteworthy", size=12))
+        self.start_date_entry.grid(row=row, column=col, padx=5, pady=(5, 5), sticky="w")
+        col += 1
+        
+        self.end_date_entry = ctk.CTkEntry(top_bar, placeholder_text="End (YYYY-MM-DD)", width=130, font=ctk.CTkFont(family="Noteworthy", size=12))
+        self.end_date_entry.grid(row=row, column=col, padx=5, pady=(5, 5), sticky="w")
+        col += 1
         
         filter_btn = ctk.CTkButton(top_bar, text="Filter", width=60, font=ctk.CTkFont(family="Noteworthy", size=12), command=self.load_transactions)
-        filter_btn.pack(side="left", padx=5)
+        filter_btn.grid(row=row, column=col, padx=5, pady=(5, 5), sticky="w")
+        col += 1
         
         refresh_btn = ctk.CTkButton(top_bar, text="Refresh", width=60, fg_color="#1f538d", hover_color="#14375e", font=ctk.CTkFont(family="Noteworthy", size=12), command=self.load_transactions)
-        refresh_btn.pack(side="left", padx=5)
+        refresh_btn.grid(row=row, column=col, padx=5, pady=(5, 5), sticky="w")
+        col += 1
         
         export_btn = ctk.CTkButton(top_bar, text="Export Excel", width=90, fg_color="#28a745", hover_color="#34ce57", font=ctk.CTkFont(family="Noteworthy", size=12), command=self.export_excel)
-        export_btn.pack(side="right", padx=5)
+        export_btn.grid(row=row, column=col, padx=5, pady=(5, 5), sticky="w")
+        col += 1
+        
+        row += 1
         
         self.export_lbl = ctk.CTkLabel(top_bar, text="", font=ctk.CTkFont(family="Noteworthy", size=12))
-        self.export_lbl.pack(side="right", padx=5)
+        self.export_lbl.grid(row=row, column=0, columnspan=6, sticky="w")
         
         # List
         self.tx_list_frame = ctk.CTkScrollableFrame(self.tab_tx)

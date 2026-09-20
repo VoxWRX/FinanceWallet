@@ -93,11 +93,11 @@ class DashboardView(ctk.CTkFrame):
         card.grid(row=0, column=column, padx=10, pady=10, sticky="ew")
         
         lbl_title = ctk.CTkLabel(card, text=title, font=ctk.CTkFont(family="Noteworthy", size=14))
-        lbl_title.pack(pady=(15, 5))
+        lbl_title.grid(row=0, column=0, pady=(15, 5), sticky="w")
         
         val_color = color if color else ("black" if ctk.get_appearance_mode() == "Light" else "white")
         lbl_value = ctk.CTkLabel(card, text=value, font=ctk.CTkFont(family="Noteworthy", size=24, weight="bold"), text_color=val_color)
-        lbl_value.pack(pady=(0, 15))
+        lbl_value.grid(row=1, column=0, pady=(0, 15), sticky="w")
 
     def create_pie_chart(self, parent, exp_by_cat):
         # Filter out categories with zero or negative total to avoid matplotlib crash
@@ -117,8 +117,8 @@ class DashboardView(ctk.CTkFrame):
         fig, ax = plt.subplots(figsize=(5, 4), facecolor=bg_color)
         ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140, 
                textprops={'color': text_color, 'family': 'fantasy'}) # fantasy is closest to handwritten in default mpl
-               
-        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+                
+        ax.axis('equal')   # Equal aspect ratio ensures that pie is drawn as a circle.
         
         canvas = FigureCanvasTkAgg(fig, master=parent)
         canvas.draw()

@@ -7,9 +7,12 @@ from contextlib import contextmanager
 
 class DatabaseManager:
     def __init__(self, db_path="finance_wallet.db"):
-        self.app_dir = os.path.expanduser("~/.finance_wallet")
+        self.app_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
         os.makedirs(self.app_dir, exist_ok=True)
-        self.db_path = os.path.join(self.app_dir, db_path)
+        if os.path.isabs(db_path):
+            self.db_path = db_path
+        else:
+            self.db_path = os.path.join(self.app_dir, db_path)
         self._init_db()
 
     @contextmanager

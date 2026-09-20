@@ -21,6 +21,9 @@ class HomeView(ctk.CTkFrame):
         for widget in self.container.winfo_children():
             widget.destroy()
             
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_rowconfigure(1, weight=0)
+            
         self.calendar = CalendarWidget(self.container, self.db, self.on_day_click)
         self.calendar.grid(row=0, column=0, sticky="nsew")
 
@@ -29,24 +32,28 @@ class HomeView(ctk.CTkFrame):
         for widget in self.container.winfo_children():
             widget.destroy()
             
+        self.container.grid_rowconfigure(0, weight=0)
+        self.container.grid_rowconfigure(1, weight=1)
+            
         # Top bar with Back button
         top_bar = ctk.CTkFrame(self.container, fg_color="transparent", height=40)
-        top_bar.pack(fill="x", pady=(0, 10))
+        top_bar.grid(column=0, row=0, sticky="ew")
+        top_bar.grid_columnconfigure(1, weight=1)
         
         back_btn = ctk.CTkButton(top_bar, text="< Back to Calendar", width=120, font=ctk.CTkFont(family="Noteworthy", size=14), command=self.show_calendar)
-        back_btn.pack(side="left")
+        back_btn.grid(row=0, column=0, padx=(10, 5), pady=15, sticky="w")
         
         date_str = selected_date.strftime("%B %d, %Y")
         lbl = ctk.CTkLabel(top_bar, text=f"Transactions for {date_str}", font=ctk.CTkFont(family="Noteworthy", size=20, weight="bold"))
-        lbl.pack(side="left", padx=20)
+        lbl.grid(row=0, column=1, padx=5, pady=15)
         
         add_btn = ctk.CTkButton(top_bar, text="+ Add Transaction", width=120, font=ctk.CTkFont(family="Noteworthy", size=14), command=lambda: self.show_add_transaction_modal(selected_date))
-        add_btn.pack(side="right")
+        add_btn.grid(row=0, column=2, padx=(5, 10), pady=15, sticky="e")
         
         # Transactions List
         self.tx_list_frame = ctk.CTkScrollableFrame(self.container)
-        self.tx_list_frame.pack(fill="both", expand=True)
-        
+        self.tx_list_frame.grid(column=0, row=1, sticky="nsew")
+
         self.load_transactions_for_day(selected_date)
         
     def load_transactions_for_day(self, date_obj):
@@ -58,45 +65,48 @@ class HomeView(ctk.CTkFrame):
         
         if not txs:
             lbl = ctk.CTkLabel(self.tx_list_frame, text="No transactions for this day.", font=ctk.CTkFont(family="Noteworthy", size=14), text_color="gray")
-            lbl.pack(pady=20)
+            lbl.grid(row=0, column=0, padx=20, pady=20)
             return
             
         currency = self.db.get_setting("currency", "$")
             
+        row = 1
         for tx in txs:
             frame = ctk.CTkFrame(self.tx_list_frame)
-            frame.pack(fill="x", pady=5, padx=5)
+            frame.grid(row=row, column=0, sticky="ew", padx=5, pady=(5, 0))
             
             amount_lbl = ctk.CTkLabel(frame, text=f"{currency}{tx['amount']:.2f}", font=ctk.CTkFont(family="Noteworthy", size=16, weight="bold"))
-            amount_lbl.pack(side="left", padx=10, pady=10)
+            amount_lbl.grid(row=0, column=0, padx=10, pady=(10, 5))
             
             desc = tx['description'] or "No Description"
             tx_name = tx.get('name', 'Transaction')
             desc_lbl = ctk.CTkLabel(frame, text=f"{tx_name} - {desc}", font=ctk.CTkFont(family="Noteworthy", size=14))
-            desc_lbl.pack(side="left", padx=10, pady=10)
+            desc_lbl.grid(row=0, column=1, padx=10, pady=(5, 10))
+            
+            row += 1
             
             # Here we can add edit/delete buttons later
+
 
     def show_add_transaction_modal(self, date_obj):
         modal = ctk.CTkToplevel(self)
         modal.title(f"Add Transaction - {date_obj.strftime('%Y-%m-%d')}")
         modal.geometry("450x550")
         modal.grab_set() 
-        
         # Name
-        ctk.CTkLabel(modal, text="Name:", font=ctk.CTkFont(family="Noteworthy", size=14)).pack(pady=(20, 5))
+        ctk.CTkLabel(modal, text="Name:", font=ctk.CTkFont(family="Noteworthy", size=14)).grid(row=0, column=0, sticky="w", pady=(20, 5))
         name_entry = ctk.CTkEntry(modal, width=250, font=ctk.CTkFont(family="Noteworthy", size=14))
-        name_entry.pack()
-        
+        name_entry.grid(row=0, column=1, padx=10, pady=(5, 5), sticky="ew")
+
         # Type (Income / Expense)
-        ctk.CTkLabel(modal, text="Type:", font=ctk.CTkFont(family="Noteworthy", size=14)).pack(pady=(10, 5))
+        ctk.CTkLabel(modal, text="Type:", font=ctk.CTkFont(family="Noteworthy", size=14)).grid(row=1, column=0, sticky="w", pady=(10, 5))
         type_var = ctk.StringVar(value="Expense")
         
         # Category Dropdown
-        ctk.CTkLabel(modal, text="Category:", font=ctk.CTkFont(family="Noteworthy", size=14)).pack(pady=(10, 5))
+        ctk.CTkLabel(modal, text="Category:", font=ctk.CTkFont(family="Noteworthy", size=14)).grid(row=2, sticky="w", pady=(10, 5))
         cat_var = ctk.StringVar()
         cat_dropdown = ctk.CTkOptionMenu(modal, variable=cat_var, width=250, font=ctk.CTkFont(family="Noteworthy", size=14))
-        cat_dropdown.pack()
+        cat_dropdown.grid(row=2, column=1, padx=10, pady=(10, 5), sticky="ew")
         
         categories_data = self.db.get_categories()
         
@@ -109,26 +119,26 @@ class HomeView(ctk.CTkFrame):
             cat_var.set(options[0])
             
         type_segmented = ctk.CTkSegmentedButton(modal, values=["Expense", "Income"], variable=type_var, font=ctk.CTkFont(family="Noteworthy", size=14), command=update_categories)
-        type_segmented.pack(pady=(0, 10))
+        type_segmented.grid(row=1, column=1, padx=10, pady=(5, 10), sticky="ew")
         
         # Initial population of categories
         update_categories()
         
         # Amount
         currency = self.db.get_setting("currency", "$")
-        ctk.CTkLabel(modal, text=f"Amount ({currency}):", font=ctk.CTkFont(family="Noteworthy", size=14)).pack(pady=(10, 5))
+        ctk.CTkLabel(modal, text=f"Amount ({currency}):", font=ctk.CTkFont(family="Noteworthy", size=14)).grid(row=3, column=0, sticky="w", pady=(10, 5))
         amount_entry = ctk.CTkEntry(modal, width=250, font=ctk.CTkFont(family="Noteworthy", size=14))
-        amount_entry.pack()
+        amount_entry.grid(row=3, column=1, padx=10, pady=(5, 5), sticky="ew")
         
         # Notes
-        ctk.CTkLabel(modal, text="Notes (Optional):", font=ctk.CTkFont(family="Noteworthy", size=14)).pack(pady=(10, 5))
+        ctk.CTkLabel(modal, text="Notes (Optional):", font=ctk.CTkFont(family="Noteworthy", size=14)).grid(row=4, column=0, sticky="w", pady=(10, 5))
         notes_entry = ctk.CTkEntry(modal, width=250, font=ctk.CTkFont(family="Noteworthy", size=14))
-        notes_entry.pack()
+        notes_entry.grid(row=4, column=1, padx=10, pady=(5, 5), sticky="ew")
         
         # Tags
-        ctk.CTkLabel(modal, text="Tags (comma separated):", font=ctk.CTkFont(family="Noteworthy", size=14)).pack(pady=(10, 5))
+        ctk.CTkLabel(modal, text="Tags (comma separated):", font=ctk.CTkFont(family="Noteworthy", size=14)).grid(row=5, column=0, sticky="w", pady=(10, 5))
         tags_entry = ctk.CTkEntry(modal, width=250, placeholder_text="e.g. vacation, gift", font=ctk.CTkFont(family="Noteworthy", size=14))
-        tags_entry.pack()
+        tags_entry.grid(row=5, column=1, padx=10, pady=(5, 5), sticky="ew")
         
         def save():
             try:
@@ -156,4 +166,4 @@ class HomeView(ctk.CTkFrame):
                 pass # Simple error handling for now
                 
         save_btn = ctk.CTkButton(modal, text="Save Transaction", font=ctk.CTkFont(family="Noteworthy", size=14), command=save)
-        save_btn.pack(pady=20)
+        save_btn.grid(row=6, column=0, columnspan=2, pady=(20, 5))

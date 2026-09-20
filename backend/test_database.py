@@ -5,7 +5,7 @@ from database import DatabaseManager
 class TestDatabaseManager(unittest.TestCase):
     def setUp(self):
         # Use a temporary file for testing
-        self.db_path = "test_db.sqlite3"
+        self.db_path = os.path.abspath("test_db.sqlite3")
         self.db = DatabaseManager(self.db_path)
         
     def tearDown(self):

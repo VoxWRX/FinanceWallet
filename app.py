@@ -107,31 +107,31 @@ class App(ctk.CTk):
         self._clear_main_frame()
         from views.home_view import HomeView
         self.current_view = HomeView(self.main_frame, self.db)
-        self.current_view.pack(fill="both", expand=True)
+        self.current_view.grid(row=0, column=0, sticky="nsew")
 
     def show_dashboard_view(self):
         self._clear_main_frame()
         from views.dashboard_view import DashboardView
         self.current_view = DashboardView(self.main_frame, self.db)
-        self.current_view.pack(fill="both", expand=True)
+        self.current_view.grid(row=0, column=0, sticky="nsew")
 
     def show_transactions_view(self):
         self._clear_main_frame()
         from views.management_view import ManagementView
         self.current_view = ManagementView(self.main_frame, self.db)
-        self.current_view.pack(fill="both", expand=True)
+        self.current_view.grid(row=0, column=0, sticky="nsew")
 
     def show_savings_view(self):
         self._clear_main_frame()
         from views.savings_view import SavingsView
         self.current_view = SavingsView(self.main_frame, self.db)
-        self.current_view.pack(fill="both", expand=True)
+        self.current_view.grid(row=0, column=0, sticky="nsew")
 
     def show_reports_view(self):
         self._clear_main_frame()
         from views.reports_view import ReportsView
         self.current_view = ReportsView(self.main_frame, self.db)
-        self.current_view.pack(fill="both", expand=True)
+        self.current_view.grid(row=0, column=0, sticky="nsew")
 
     def show_settings_view(self):
         self._clear_main_frame()

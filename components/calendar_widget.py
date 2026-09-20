@@ -85,18 +85,30 @@ class CalendarWidget(ctk.CTkFrame):
                 tx_by_date[dt] = []
             tx_by_date[dt].append(tx)
 
+        today_date = date.today()
+
         # Render grid (Google Calendar style: thin borders, number top left)
         for row_idx, week in enumerate(month_days, start=1):
             self.grid_frame.grid_rowconfigure(row_idx, weight=1, uniform="row")
             for col_idx, day_date in enumerate(week):
                 # Determine colors
                 is_current_month = (day_date.month == self.current_month)
+                is_today = (day_date == today_date)
+                
                 bg_color = "white" if ctk.get_appearance_mode() == "Light" else "gray15"
                 if not is_current_month:
                     bg_color = "gray95" if ctk.get_appearance_mode() == "Light" else "gray10"
+                    
+                border_color = "gray80" if ctk.get_appearance_mode() == "Light" else "gray30"
+                border_width = 1
+                
+                if is_today:
+                    bg_color = "#e6f2ff" if ctk.get_appearance_mode() == "Light" else "#1c3d5a"
+                    border_color = "#007bff"
+                    border_width = 2
                 
                 # Cell frame
-                cell_frame = ctk.CTkFrame(self.grid_frame, fg_color=bg_color, corner_radius=0, border_width=1, border_color="gray80" if ctk.get_appearance_mode() == "Light" else "gray30")
+                cell_frame = ctk.CTkFrame(self.grid_frame, fg_color=bg_color, corner_radius=0, border_width=border_width, border_color=border_color)
                 cell_frame.grid(row=row_idx, column=col_idx, sticky="nsew", padx=0, pady=0)
                 self.cells.append(cell_frame)
                 
@@ -107,9 +119,11 @@ class CalendarWidget(ctk.CTkFrame):
                 cell_frame.bind("<Button-1>", on_click)
                 
                 # Day Number (Top Left)
-                day_lbl = ctk.CTkLabel(cell_frame, text=str(day_date.day), font=ctk.CTkFont(family="Noteworthy", size=11), text_color="black" if ctk.get_appearance_mode()=="Light" else "white")
-                if not is_current_month:
+                day_lbl = ctk.CTkLabel(cell_frame, text=str(day_date.day), font=ctk.CTkFont(family="Noteworthy", size=11, weight="bold" if is_today else "normal"), text_color="black" if ctk.get_appearance_mode()=="Light" else "white")
+                if not is_current_month and not is_today:
                     day_lbl.configure(text_color="gray60")
+                if is_today:
+                    day_lbl.configure(text_color="#007bff")
                 day_lbl.pack(anchor="nw", padx=5, pady=2)
                 day_lbl.bind("<Button-1>", on_click)
                 
